@@ -38,61 +38,15 @@ class ResumenMensualResource extends Resource
     {
         return $table
 
-        ->query(
-
-            \App\Models\ResumenMensual::query()
-
-                ->fromSub(
-
-                    \App\Models\Movimiento::query()
-
-                        ->selectRaw('
-
-                            CONCAT(
-                                YEAR(fecha),
-                                "-",
-                                LPAD(MONTH(fecha),2,"0")
-                            ) as id,
-
-                            YEAR(fecha) as anio,
-
-                            MONTH(fecha) as mes,
-
-                            SUM(
-                                CASE
-                                    WHEN tipo = "ingreso"
-                                    THEN monto
-                                    ELSE 0
-                                END
-                            ) as ingresos,
-
-                            SUM(
-                                CASE
-                                    WHEN tipo = "egreso"
-                                    THEN monto
-                                    ELSE 0
-                                END
-                            ) as egresos
-
-                        ')
-
-                        ->groupByRaw('YEAR(fecha), MONTH(fecha)'),
-
-                    'resumen_mensual'
-
-                )
-
-        )
+            ->defaultSort('id', 'desc')
 
             ->columns([
 
                 TextColumn::make('mes')
                     ->label('Mes')
-                    ->formatStateUsing(function ($state) {
-
-                        return ResumenMensual::nombreMes($state);
-
-                    }),
+                    ->formatStateUsing(fn ($state) =>
+                        ResumenMensual::nombreMes($state)
+                    ),
 
                 TextColumn::make('anio')
                     ->label('Año'),
@@ -100,11 +54,13 @@ class ResumenMensualResource extends Resource
                 TextColumn::make('ingresos')
                     ->label('Total Ingresos')
                     ->money('ARS')
+                    ->badge()
                     ->color('success'),
 
                 TextColumn::make('egresos')
                     ->label('Total Egresos')
                     ->money('ARS')
+                    ->badge()
                     ->color('danger'),
 
                 TextColumn::make('balance')
@@ -112,15 +68,144 @@ class ResumenMensualResource extends Resource
                     ->state(fn ($record) =>
                         $record->ingresos - $record->egresos
                     )
-                    ->money('ARS'),
+                    ->money('ARS')
+                    ->badge()
+                    ->color('info'),
 
             ])
 
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label('Ver')
 
-                Tables\Actions\ViewAction::make(),
+                    ->record(fn ($record) => $record) // ⭐ ESTA LÍNEA SOLUCIONA EL ERROR
+
+                    ->modalHeading(fn ($record) =>
+                        'Resumen ' .
+                        ResumenMensual::nombreMes($record->mes)
+                        . ' ' . $record->anio
+                    )
+
+                    ->infolist([
+
+                        \Filament\Infolists\Components\Section::make('Movimientos del mes')
+
+                            ->schema([
+
+                                \Filament\Infolists\Components\RepeatableEntry::make('')
+
+                                    ->schema([
+
+                                        \Filament\Infolists\Components\TextEntry::make('concepto.nombre')
+                                            ->label('Concepto'),
+
+                                        \Filament\Infolists\Components\TextEntry::make('tipo')
+                                            ->label('Tipo')
+                                            ->badge()
+                                            ->color(fn ($state) =>
+                                                $state === 'ingreso'
+                                                    ? 'success'
+                                                    : 'danger'
+                                            ),
+
+                                        \Filament\Infolists\Components\TextEntry::make('monto')
+                                            ->label('Monto')
+                                            ->money('ARS'),
+
+                                    ])
+
+                                    ->columns(3)
+
+                                    ->state(function ($record) {
+
+                                        return Movimiento::query()
+
+                                            ->whereYear('fecha', $record->anio)
+                                            ->whereMonth('fecha', $record->mes)
+
+                                            ->with('concepto')
+
+                                            ->get()
+
+                                            ->toArray();
+
+                                    }),
+
+                            ]),
+
+                        \Filament\Infolists\Components\Section::make('Totales')
+
+                            ->columns(3)
+
+                            ->schema([
+
+                                \Filament\Infolists\Components\TextEntry::make('ingresos')
+                                    ->label('Total Ingresos')
+                                    ->money('ARS')
+                                    ->badge()
+                                    ->color('success'),
+
+                                \Filament\Infolists\Components\TextEntry::make('egresos')
+                                    ->label('Total Egresos')
+                                    ->money('ARS')
+                                    ->badge()
+                                    ->color('danger'),
+
+                                \Filament\Infolists\Components\TextEntry::make('balance')
+                                    ->label('Balance')
+                                    ->state(fn ($record) =>
+                                        $record->ingresos - $record->egresos
+                                    )
+                                    ->money('ARS')
+                                    ->badge()
+                                    ->color('info'),
+
+                            ]),
+
+                    ])
 
             ]);
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return ResumenMensual::query()
+
+            ->fromSub(
+
+                Movimiento::query()
+
+                    ->selectRaw('
+
+                        DATE_FORMAT(fecha, "%Y-%m") as id,
+
+                        YEAR(fecha) as anio,
+
+                        MONTH(fecha) as mes,
+
+                        SUM(
+                            CASE
+                                WHEN tipo = "ingreso"
+                                THEN monto
+                                ELSE 0
+                            END
+                        ) as ingresos,
+
+                        SUM(
+                            CASE
+                                WHEN tipo = "egreso"
+                                THEN monto
+                                ELSE 0
+                            END
+                        ) as egresos
+
+                    ')
+
+                    ->groupByRaw('YEAR(fecha), MONTH(fecha)'),
+
+                'resumen_mensual'
+
+            );
     }
 
     public static function getPages(): array
@@ -128,7 +213,6 @@ class ResumenMensualResource extends Resource
         return [
 
             'index' => Pages\ListResumenMensuals::route('/'),
-            'view' => Pages\ViewResumenMensual::route('/{record}'),
 
         ];
     }

@@ -10,10 +10,16 @@ class ListResumenMensuals extends ListRecords
 {
     protected static string $resource = ResumenMensualResource::class;
 
-    protected function getHeaderActions(): array
+    public function getBreadcrumbs(): array
     {
         return [
-            Actions\CreateAction::make(),
+            route('filament.admin.resources.resumen-mensuals.index') => 'Meses',
+            '' => 'Lista'
         ];
+    }
+
+    public function getTitle(): string
+    {
+        return 'Resumenes mensuales';
     }
 }

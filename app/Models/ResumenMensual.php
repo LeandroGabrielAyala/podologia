@@ -6,11 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class ResumenMensual extends Model
 {
-    protected $table = 'movimientos';
+    protected $table = 'resumen_mensual';
 
     public $timestamps = false;
 
     protected $guarded = [];
+
+    protected $primaryKey = 'id';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
+    /**
+     * ⭐ ESTA ES LA CLAVE
+     * Evita que Laravel busque movimientos.id
+     */
+    protected function setKeysForSaveQuery($query)
+    {
+        return $query;
+    }
 
     public static function nombreMes($mes)
     {
