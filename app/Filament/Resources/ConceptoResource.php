@@ -86,6 +86,7 @@ class ConceptoResource extends Resource
                     ),
 
             ])
+            ->defaultSort('nombre', 'asc')
 
             ->actions([
 
