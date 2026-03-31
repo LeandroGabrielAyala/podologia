@@ -74,7 +74,7 @@ class ConceptoResource extends Resource
             ->columns([
 
                 TextColumn::make('nombre')
-                    ->label('Conceptoooo')
+                    ->label('Concepto')
                     ->searchable(),
 
                 TextColumn::make('tipo')
