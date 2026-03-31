@@ -13,7 +13,7 @@ class FinanzasOverview extends BaseWidget
     {
         // Totales generales
 
-        $ingresos = Movimiento::where('tipxxxxo', 'ingreso')->sum('monto');
+        $ingresos = Movimiento::where('tipo', 'ingreso')->sum('monto');
 
         $egresos = Movimiento::where('tipo', 'egreso')->sum('monto');
 
