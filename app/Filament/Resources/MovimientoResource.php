@@ -32,17 +32,10 @@ class MovimientoResource extends Resource
     protected static ?string $navigationLabel = 'Movimientos';
 
     protected static ?string $navigationGroup = 'Finanzas';
-
-<<<<<<< HEAD
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
-    }
-=======
+    
     protected static ?string $modelLabel = 'Movimiento';
 
     protected static ?string $pluralModelLabel = 'Movimientos';
->>>>>>> 466c1d7598c8dc66820bc8577cc1dff858fa51b7
 
     /**
      * Badge contador en menú

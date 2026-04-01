@@ -30,11 +30,6 @@ class ConceptoResource extends Resource
 
     protected static ?string $navigationGroup = 'Configuración';
 
-    protected function getRedirectUrl(): string
-    {
-        return $this->getResource()::getUrl('index');
-    }
-
     /**
      * Badge contador
      */
