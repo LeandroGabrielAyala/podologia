@@ -33,6 +33,11 @@ class MovimientoResource extends Resource
 
     protected static ?string $navigationGroup = 'Finanzas';
 
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
     /**
      * Badge contador en menú
      */
