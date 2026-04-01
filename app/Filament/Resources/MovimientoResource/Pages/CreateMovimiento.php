@@ -11,11 +11,14 @@ class CreateMovimiento extends CreateRecord
 {
     protected static string $resource = MovimientoResource::class;
 
-    protected function getRedirectUrl(): string
+    /**
+     * 🔥 REDIRIGIR A LISTA DESPUÉS DE EDITAR
+     */
+    protected function getRedirectUrlAfterSave(): string
     {
         return $this->getResource()::getUrl('index');
     }
-
+    
     protected function getCreatedNotification(): ?Notification
     {
         return Notification::make()

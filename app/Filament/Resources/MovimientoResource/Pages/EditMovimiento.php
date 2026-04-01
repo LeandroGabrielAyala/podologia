@@ -11,6 +11,14 @@ class EditMovimiento extends EditRecord
 {
     protected static string $resource = MovimientoResource::class;
 
+    /**
+     * 🔥 REDIRIGIR A LISTA DESPUÉS DE EDITAR
+     */
+    protected function getRedirectUrlAfterSave(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
