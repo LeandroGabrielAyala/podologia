@@ -91,12 +91,15 @@ class ConceptoResource extends Resource
                     ),
 
             ])
+            ->defaultSort('nombre', 'asc')
 
             ->actions([
 
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->label('Ver'),
 
                 Tables\Actions\EditAction::make()
+                    ->label('Editar')
                     ->after(function () {
 
                         Notification::make()
@@ -106,7 +109,11 @@ class ConceptoResource extends Resource
 
                     }),
 
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->label('Borrar')
+                    ->modalHeading('Eliminar concepto')
+                    ->modalDescription('¿Estás seguro de eliminar este concepto?')
+                    ->modalSubmitActionLabel('Sí, eliminar'),
 
             ]);
     }

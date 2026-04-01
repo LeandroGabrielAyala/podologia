@@ -21,6 +21,18 @@ class ListMovimientos extends ListRecords
     protected static string $resource = MovimientoResource::class;
 
     /**
+     * Breadcrum
+     */
+
+    public function getBreadcrumbs(): array
+    {
+        return [
+            route('filament.admin.resources.movimientos.index') => 'Movimientos',
+            '' => 'Lista',
+        ];
+    }
+
+    /**
      * Acción crear
      */
 
@@ -29,6 +41,7 @@ class ListMovimientos extends ListRecords
         return [
 
             Actions\CreateAction::make()
+                ->label('Nuevo movimiento')
                 ->after(function () {
 
                     Notification::make()

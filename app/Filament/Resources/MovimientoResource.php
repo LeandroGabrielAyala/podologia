@@ -33,10 +33,16 @@ class MovimientoResource extends Resource
 
     protected static ?string $navigationGroup = 'Finanzas';
 
+<<<<<<< HEAD
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
     }
+=======
+    protected static ?string $modelLabel = 'Movimiento';
+
+    protected static ?string $pluralModelLabel = 'Movimientos';
+>>>>>>> 466c1d7598c8dc66820bc8577cc1dff858fa51b7
 
     /**
      * Badge contador en menú
@@ -51,7 +57,7 @@ class MovimientoResource extends Resource
      */
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'success';
+        return 'primary';
     }
 
     /**
@@ -102,6 +108,7 @@ class MovimientoResource extends Resource
                 Textarea::make('descripcion')
                     ->label('Descripción')
                     ->rows(3)
+                    ->columnSpanFull()
 
             ]);
     }
@@ -132,6 +139,8 @@ class MovimientoResource extends Resource
                 TextColumn::make('monto')
                     ->label('Monto')
                     ->money('ARS')
+                    // ->badge()
+                    ->color('info')
                     ->sortable(),
 
                 TextColumn::make('fecha')
@@ -148,35 +157,47 @@ class MovimientoResource extends Resource
                  */
 
                 Tables\Actions\ViewAction::make()
+                    ->label('Ver')
+
+                    ->modalHeading(fn ($record) =>
+                        'Movimiento - $' . number_format($record->monto, 2, ',', '.')
+                    )
+
                     ->infolist([
 
-                        TextEntry::make('tipo')
-                            ->label('Tipo')
-                            ->badge()
-                            ->color(fn ($state) =>
-                                $state === 'ingreso'
-                                    ? 'success'
-                                    : 'danger'
-                            ),
+                        \Filament\Infolists\Components\Section::make('Detalle del movimiento')
+                            ->columns(2) // ⭐ dos columnas
 
-                        TextEntry::make('concepto.nombre')
-                            ->label('Concepto'),
+                            ->schema([
 
-                        TextEntry::make('monto')
-                            ->label('Monto')
-                            ->money('ARS'),
+                                TextEntry::make('tipo')
+                                    ->label('TIPO')
+                                    ->badge()
+                                    ->color(fn ($state) =>
+                                        $state === 'ingreso'
+                                            ? 'success'
+                                            : 'danger'
+                                    ),
 
-                        TextEntry::make('fecha')
-                            ->label('Fecha')
-                            ->date('d/m/Y'),
+                                TextEntry::make('concepto.nombre')
+                                    ->label('CONCEPTO')
+                                    ->badge('primary'),
 
-                        TextEntry::make('descripcion')
-                            ->label('Descripción')
-                            ->placeholder('Sin descripción'),
+                                TextEntry::make('monto')
+                                    ->label('MONTO')
+                                    ->money('ARS'),
 
-                        TextEntry::make('created_at')
-                            ->label('Creado')
-                            ->dateTime('d/m/Y H:i'),
+                                TextEntry::make('fecha')
+                                    ->label('FECHA')
+                                    ->date('d/m/Y'),
+
+                                TextEntry::make('descripcion')
+                                    ->label('DESCRIPCIÓN')
+                                    ->weight('italic')
+                                    ->placeholder('Sin descripción')
+                                    ->columnSpanFull(), // ⭐ ocupa todo el ancho
+
+                            ]),
 
                     ]),
 
@@ -185,6 +206,7 @@ class MovimientoResource extends Resource
                  */
 
                 Tables\Actions\EditAction::make()
+                    ->label('Editar')
                     ->after(function () {
 
                         Notification::make()
@@ -199,20 +221,16 @@ class MovimientoResource extends Resource
                  */
 
                 Tables\Actions\DeleteAction::make()
-                    ->after(function () {
-
-                        Notification::make()
-                            ->title('Movimiento eliminado correctamente')
-                            ->danger()
-                            ->send();
-
-                    }),
+                    ->label('Borrar')
+                    ->modalHeading('Eliminar movimiento')
+                    ->modalDescription('¿Estás seguro de eliminar este movimiento?')
+                    ->modalSubmitActionLabel('Sí, eliminar'),
 
             ])
 
             ->bulkActions([
 
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()->label('Eliminar seleccionados'),
 
             ]);
     }
