@@ -32,7 +32,7 @@ class MovimientoResource extends Resource
     protected static ?string $navigationLabel = 'Movimientos';
 
     protected static ?string $navigationGroup = 'Finanzas';
-    
+
     protected static ?string $modelLabel = 'Movimiento';
 
     protected static ?string $pluralModelLabel = 'Movimientos';
@@ -217,7 +217,15 @@ class MovimientoResource extends Resource
                     ->label('Borrar')
                     ->modalHeading('Eliminar movimiento')
                     ->modalDescription('¿Estás seguro de eliminar este movimiento?')
-                    ->modalSubmitActionLabel('Sí, eliminar'),
+                    ->modalSubmitActionLabel('Sí, eliminar')
+                    ->after(function () {
+
+                        Notification::make()
+                            ->title('Movimiento eliminado correctamente')
+                            ->success()
+                            ->send();
+
+                    }),
 
             ])
 

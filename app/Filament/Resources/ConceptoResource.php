@@ -98,7 +98,7 @@ class ConceptoResource extends Resource
                     ->after(function () {
 
                         Notification::make()
-                            ->title('Concepto actualizado')
+                            ->title('Concepto actualizado correctamente')
                             ->success()
                             ->send();
 
@@ -108,7 +108,15 @@ class ConceptoResource extends Resource
                     ->label('Borrar')
                     ->modalHeading('Eliminar concepto')
                     ->modalDescription('¿Estás seguro de eliminar este concepto?')
-                    ->modalSubmitActionLabel('Sí, eliminar'),
+                    ->modalSubmitActionLabel('Sí, eliminar')
+                    ->after(function () {
+
+                        Notification::make()
+                            ->title('Concepto eliminado correctamente')
+                            ->success()
+                            ->send();
+
+                    }),
 
             ]);
     }
